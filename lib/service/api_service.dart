@@ -1,7 +1,43 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+import 'package:news_app/models/news_response.dart';
+import 'package:news_app/service/api_response.dart';
+import 'package:news_app/service/rest_client.dart';
+
 class ApiService {
-  static final String _baseUrl = 'https://newsapi.org/v2/';
   static final String _apiKey = '84a072f692a848689b11ff35496cddcc';
 
-  
+  Dio _dio;
+  RestClient _client;
 
+  ApiService() {
+    _dio = Dio()
+      ..interceptors.add(
+        InterceptorsWrapper(
+          onRequest: (options) {
+            options.headers.addAll(
+              {
+                'X-Api-Key': _apiKey,
+              },
+            );
+          },
+        ),
+      );
+
+    _client = RestClient(_dio);
+  }
+
+  Future<NewsResponse> getNewsFromCountry(
+      String country, String query, int page) async {
+    NewsResponse newsResponse;
+
+    try {
+      final response = await _client.getNewsFromCountry(country, query, page);
+      newsResponse = response;
+    } catch (e) {
+      print(e);
+    }
+
+    return newsResponse;
+  }
 }
