@@ -1,7 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:flutter/material.dart';
 import 'package:news_app/models/news_response.dart';
-import 'package:news_app/service/api_response.dart';
 import 'package:news_app/service/rest_client.dart';
 
 class ApiService {

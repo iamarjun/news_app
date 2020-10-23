@@ -1,5 +1,9 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:news_app/screens/home/bloc/headlines_bloc.dart';
 import 'package:news_app/screens/home/home_page.dart';
+import 'package:news_app/service/api_service.dart';
 
 void main() {
   runApp(MyApp());
@@ -16,7 +20,12 @@ class MyApp extends StatelessWidget {
         scaffoldBackgroundColor: Color(0xFFF5F9FD),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(),
+      debugShowCheckedModeBanner: false,
+      home: BlocProvider<HeadlinesBloc>(
+        create: (context) =>
+            HeadlinesBloc(service: ApiService())..add(HeadlinesFetch()),
+        child: MyHomePage(),
+      ),
     );
   }
 }
