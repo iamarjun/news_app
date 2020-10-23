@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:news_app/models/country.dart';
 import 'package:news_app/screens/home/bloc/headlines_bloc.dart';
 import 'package:news_app/screens/home/widgets/article_widget.dart';
 import 'package:news_app/screens/home/widgets/bottom_loader.dart';
+import 'package:news_app/screens/home/widgets/location_bottom_sheet.dart';
 import 'package:news_app/screens/home/widgets/search_widget.dart';
+import 'package:news_app/utils/constants.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
@@ -15,6 +18,8 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final _scrollController = ScrollController();
   final _scrollThreshold = 200.0;
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  int _selectedCountry = 0;
   HeadlinesBloc _headlinesBloc;
   String _selection;
 
@@ -28,11 +33,27 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         title: Text('News'),
         actions: [
           InkWell(
-            onTap: () {},
+            onTap: () => showModalBottomSheet(
+              backgroundColor: Colors.transparent,
+              context: context,
+              builder: (context) => LocationBottomSheet(
+                index: _selectedCountry,
+                countryList: countryList,
+                onChanged: (index, e) {
+                  setState(() {
+                    _selectedCountry = index;
+                    e.setSelected = !e.isSelected;
+                  });
+                  print(countryList[index]);
+                  Navigator.pop(context);
+                },
+              ),
+            ),
             child: Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 16.0,
@@ -129,6 +150,12 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
           ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: Icon(
+          Icons.filter_alt,
         ),
       ),
     );
