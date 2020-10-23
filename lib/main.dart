@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xFF0C54BE),
         accentColor: Color(0xFF303F60),
         scaffoldBackgroundColor: Color(0xFFF5F9FD),
+        textTheme: TextTheme(),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       debugShowCheckedModeBanner: false,

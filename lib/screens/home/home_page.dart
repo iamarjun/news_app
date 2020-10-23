@@ -31,11 +31,16 @@ class _MyHomePageState extends State<MyHomePage> {
         actions: [
           InkWell(
             onTap: () {},
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [Icon(Icons.location_on), Text('India')],
+            child: Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [Icon(Icons.location_on), Text('India')],
+              ),
             ),
-          )
+          ),
         ],
       ),
       body: BlocBuilder<HeadlinesBloc, HeadlinesState>(
