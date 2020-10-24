@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:news_app/models/country.dart';
 import 'package:news_app/screens/home/bloc/headlines_bloc.dart';
 import 'package:news_app/screens/home/widgets/article_widget.dart';
 import 'package:news_app/screens/home/widgets/bottom_loader.dart';
 import 'package:news_app/screens/home/widgets/location_bottom_sheet.dart';
 import 'package:news_app/screens/home/widgets/search_widget.dart';
+import 'package:news_app/screens/source/cubit/source_cubit.dart';
+import 'package:news_app/screens/source/source_bottom_sheet.dart';
 import 'package:news_app/utils/constants.dart';
 
 class MyHomePage extends StatefulWidget {
@@ -152,11 +153,44 @@ class _MyHomePageState extends State<MyHomePage> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: Icon(
-          Icons.filter_alt,
-        ),
+      floatingActionButton: BlocBuilder<SourceCubit, SourceState>(
+        builder: (context, state) {
+          if (state is SourceInitial || state is SourceFailure) {
+            return FloatingActionButton(
+              child: Icon(
+                Icons.filter_alt,
+              ),
+              onPressed: () {
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('SomeThing went wrong'),
+                  ),
+                );
+              },
+            );
+          }
+          if (state is SourceSuccess) {
+            if (state.sources.isEmpty) {
+              return Center(
+                child: Text('no posts'),
+              );
+            }
+            return FloatingActionButton(
+              child: Icon(
+                Icons.filter_alt,
+              ),
+              onPressed: () {
+                showModalBottomSheet(
+                  backgroundColor: Colors.transparent,
+                  context: context,
+                  builder: (context) => SourceBottomSheet(
+                    source: state.sources,
+                  ),
+                );
+              },
+            );
+          }
+        },
       ),
     );
   }

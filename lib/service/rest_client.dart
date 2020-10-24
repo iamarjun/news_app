@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:news_app/models/news_response.dart';
+import 'package:news_app/models/source_response.dart';
 import 'package:retrofit/retrofit.dart';
 
 part 'rest_client.g.dart';
@@ -8,8 +9,8 @@ part 'rest_client.g.dart';
 abstract class RestClient {
   factory RestClient(Dio dio, {String baseUrl}) = _RestClient;
 
-  // @GET("sources")
-  //    fun getSources(): SourceResponse
+  @GET("sources")
+  Future<SourceResponse> getSources();
 
   @GET("top-headlines")
   Future<NewsResponse> getNewsFromCountry(

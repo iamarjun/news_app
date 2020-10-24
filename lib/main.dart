@@ -1,8 +1,8 @@
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/screens/home/bloc/headlines_bloc.dart';
 import 'package:news_app/screens/home/home_page.dart';
+import 'package:news_app/screens/source/cubit/source_cubit.dart';
 import 'package:news_app/service/api_service.dart';
 import 'package:news_app/utils/constants.dart';
 
@@ -11,6 +11,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final ApiService service = ApiService();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -23,9 +24,18 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       debugShowCheckedModeBanner: false,
-      home: BlocProvider<HeadlinesBloc>(
-        create: (context) =>
-            HeadlinesBloc(service: ApiService())..add(HeadlinesFetch()),
+      home: MultiBlocProvider(
+        providers: [
+          BlocProvider<HeadlinesBloc>(
+            create: (context) => HeadlinesBloc(service: service)
+              ..add(
+                HeadlinesFetch(),
+              ),
+          ),
+          BlocProvider<SourceCubit>(
+            create: (context) => SourceCubit(service: service)..getSources(),
+          ),
+        ],
         child: MyHomePage(),
       ),
     );

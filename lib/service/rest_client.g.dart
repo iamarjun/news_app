@@ -17,6 +17,23 @@ class _RestClient implements RestClient {
   String baseUrl;
 
   @override
+  Future<SourceResponse> getSources() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _data = <String, dynamic>{};
+    final _result = await _dio.request<Map<String, dynamic>>('sources',
+        queryParameters: queryParameters,
+        options: RequestOptions(
+            method: 'GET',
+            headers: <String, dynamic>{},
+            extra: _extra,
+            baseUrl: baseUrl),
+        data: _data);
+    final value = SourceResponse.fromJson(_result.data);
+    return value;
+  }
+
+  @override
   Future<NewsResponse> getNewsFromCountry(country, q, page) async {
     ArgumentError.checkNotNull(country, 'country');
     ArgumentError.checkNotNull(q, 'q');

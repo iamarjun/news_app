@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:news_app/models/news_response.dart';
+import 'package:news_app/models/source_response.dart';
 import 'package:news_app/service/rest_client.dart';
 
 class ApiService {
@@ -37,5 +38,18 @@ class ApiService {
     }
 
     return newsResponse;
+  }
+  
+  Future<SourceResponse> getSource() async {
+    SourceResponse sourceResponse;
+
+    try {
+      final response = await _client.getSources();
+      sourceResponse = response;
+    } catch (e) {
+      print(e);
+    }
+
+    return sourceResponse;
   }
 }
