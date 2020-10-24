@@ -53,6 +53,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   print(countryList[index]);
                   Navigator.pop(context);
                 },
+                onPressed: () {},
               ),
             ),
             child: Padding(
@@ -155,15 +156,23 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: BlocBuilder<SourceCubit, SourceState>(
         builder: (context, state) {
-          if (state is SourceInitial || state is SourceFailure) {
-            return FloatingActionButton(
-              child: Icon(
-                Icons.filter_alt,
-              ),
-              onPressed: () {
+          if (state is SourceInitial) {
+            return buildFloatingActionButton(
+              () {
                 Scaffold.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('SomeThing went wrong'),
+                    content: Text('Loading Sources...'),
+                  ),
+                );
+              },
+            );
+          }
+          if (state is SourceFailure) {
+            return buildFloatingActionButton(
+              () {
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Something went wrong...'),
                   ),
                 );
               },
@@ -171,20 +180,24 @@ class _MyHomePageState extends State<MyHomePage> {
           }
           if (state is SourceSuccess) {
             if (state.sources.isEmpty) {
-              return Center(
-                child: Text('no posts'),
+              return buildFloatingActionButton(
+                () {
+                  Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Sources not available...'),
+                    ),
+                  );
+                },
               );
             }
-            return FloatingActionButton(
-              child: Icon(
-                Icons.filter_alt,
-              ),
-              onPressed: () {
+            return buildFloatingActionButton(
+              () {
                 showModalBottomSheet(
                   backgroundColor: Colors.transparent,
                   context: context,
                   builder: (context) => SourceBottomSheet(
                     source: state.sources,
+                    onPressed: () {},
                   ),
                 );
               },
@@ -192,6 +205,15 @@ class _MyHomePageState extends State<MyHomePage> {
           }
         },
       ),
+    );
+  }
+
+  FloatingActionButton buildFloatingActionButton(Function onPressed) {
+    return FloatingActionButton(
+      child: Icon(
+        Icons.filter_alt,
+      ),
+      onPressed: onPressed,
     );
   }
 

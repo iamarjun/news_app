@@ -4,9 +4,11 @@ import 'package:news_app/utils/constants.dart';
 
 class SourceBottomSheet extends StatefulWidget {
   final List<Sources> source;
+  final Function onPressed;
   const SourceBottomSheet({
     Key key,
-    this.source,
+    @required this.source,
+    @required this.onPressed,
   }) : super(key: key);
 
   @override
@@ -74,7 +76,7 @@ class _SourceBottomSheetState extends State<SourceBottomSheet> {
             ),
             Center(
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: widget.onPressed,
                 child: Text('Apply Filters'),
               ),
             ),

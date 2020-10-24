@@ -6,12 +6,14 @@ class LocationBottomSheet extends StatelessWidget {
   final index;
   final List<Country> countryList;
   final Function onChanged;
-  const LocationBottomSheet({
-    Key key,
-    this.index,
-    @required this.countryList,
-    @required this.onChanged,
-  }) : super(key: key);
+  final Function onPressed;
+  const LocationBottomSheet(
+      {Key key,
+      this.index,
+      @required this.countryList,
+      @required this.onChanged,
+      @required this.onPressed})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +73,7 @@ class LocationBottomSheet extends StatelessWidget {
             ),
             Center(
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: onPressed,
                 child: Text('Apply'),
               ),
             ),
