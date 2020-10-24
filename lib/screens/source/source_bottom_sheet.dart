@@ -69,6 +69,18 @@ class _SourceBottomSheetState extends State<SourceBottomSheet> {
                     .toList(),
               ),
             ),
+            SizedBox(
+              height: 10.0,
+            ),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {},
+                child: Text('Apply Filters'),
+              ),
+            ),
+            SizedBox(
+              height: 10.0,
+            ),
           ],
         ),
       ),

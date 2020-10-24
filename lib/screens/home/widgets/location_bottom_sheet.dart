@@ -66,6 +66,18 @@ class LocationBottomSheet extends StatelessWidget {
                     .toList(),
               ),
             ),
+            SizedBox(
+              height: 10.0,
+            ),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {},
+                child: Text('Apply'),
+              ),
+            ),
+            SizedBox(
+              height: 10.0,
+            ),
           ],
         ),
       ),
