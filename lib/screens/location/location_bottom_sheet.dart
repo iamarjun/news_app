@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/models/country.dart';
+import 'package:news_app/models/data_holder.dart';
 import 'package:news_app/utils/constants.dart';
 
-class LocationBottomSheet extends StatelessWidget {
-  final index;
-  final List<Country> countryList;
+class LocationBottomSheet extends StatefulWidget {
+  final LocationDataHolder dataHolder;
   final Function onChanged;
   final Function onPressed;
   const LocationBottomSheet(
       {Key key,
-      this.index,
-      @required this.countryList,
+      @required this.dataHolder,
       @required this.onChanged,
       @required this.onPressed})
       : super(key: key);
 
   @override
+  _LocationBottomSheetState createState() => _LocationBottomSheetState();
+}
+
+class _LocationBottomSheetState extends State<LocationBottomSheet> {
+  @override
   Widget build(BuildContext context) {
-    print(index);
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
@@ -55,14 +57,18 @@ class LocationBottomSheet extends StatelessWidget {
             ),
             Expanded(
               child: ListView(
-                children: countryList
+                children: widget.dataHolder.countries
                     .map(
                       (e) => RadioListTile(
                         title: Text(e.name),
                         controlAffinity: ListTileControlAffinity.trailing,
-                        value: countryList.indexOf(e),
-                        groupValue: index,
-                        onChanged: (value) => onChanged(value, e),
+                        value: e.index,
+                        groupValue: widget.dataHolder.selectedCountryIndex,
+                        onChanged: (value) {
+                          setState(() {
+                            widget.dataHolder.selectedCountryIndex = e.index;
+                          });
+                        },
                       ),
                     )
                     .toList(),
@@ -73,7 +79,7 @@ class LocationBottomSheet extends StatelessWidget {
             ),
             Center(
               child: ElevatedButton(
-                onPressed: onPressed,
+                onPressed: widget.onPressed,
                 child: Text('Apply'),
               ),
             ),

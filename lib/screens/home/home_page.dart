@@ -3,11 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/screens/home/bloc/headlines_bloc.dart';
 import 'package:news_app/screens/home/widgets/article_widget.dart';
 import 'package:news_app/screens/home/widgets/bottom_loader.dart';
-import 'package:news_app/screens/home/widgets/location_bottom_sheet.dart';
+import 'package:news_app/screens/location/cubit/location_cubit.dart';
+import 'package:news_app/screens/location/location_bottom_sheet.dart';
 import 'package:news_app/screens/home/widgets/search_widget.dart';
 import 'package:news_app/screens/source/cubit/source_cubit.dart';
 import 'package:news_app/screens/source/source_bottom_sheet.dart';
-import 'package:news_app/utils/constants.dart';
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key}) : super(key: key);
@@ -38,33 +38,53 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text('News'),
         actions: [
-          InkWell(
-            onTap: () => showModalBottomSheet(
-              backgroundColor: Colors.transparent,
-              context: context,
-              builder: (context) => LocationBottomSheet(
-                index: _selectedCountry,
-                countryList: countryList,
-                onChanged: (index, e) {
-                  setState(() {
-                    _selectedCountry = index;
-                    e.setSelected = !e.isSelected;
+          BlocBuilder<LocationCubit, LocationState>(
+            builder: (context, state) {
+              if (state is LocationInitial) {
+                return buildLocationInkWell(() {
+                  Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Loading locations...'),
+                    ),
+                  );
+                });
+              }
+
+              if (state is LocationFailure) {
+                return buildLocationInkWell(() {
+                  Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Something went wrong...'),
+                    ),
+                  );
+                });
+              }
+
+              if (state is LocationSuccess) {
+                if (state.dataHolder.countries.isEmpty) {
+                  return buildLocationInkWell(() {
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Locations not available...'),
+                      ),
+                    );
                   });
-                  print(countryList[index]);
-                  Navigator.pop(context);
-                },
-                onPressed: () {},
-              ),
-            ),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16.0,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [Icon(Icons.location_on), Text('India')],
-              ),
-            ),
+                }
+                return buildLocationInkWell(
+                  () {
+                    showModalBottomSheet(
+                      backgroundColor: Colors.transparent,
+                      context: context,
+                      builder: (context) => LocationBottomSheet(
+                        dataHolder: state.dataHolder,
+                        onChanged: (value) {},
+                        onPressed: () {},
+                      ),
+                    );
+                  },
+                );
+              }
+            },
           ),
         ],
       ),
@@ -204,6 +224,21 @@ class _MyHomePageState extends State<MyHomePage> {
             );
           }
         },
+      ),
+    );
+  }
+
+  InkWell buildLocationInkWell(Function onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16.0,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Icon(Icons.location_on), Text('India')],
+        ),
       ),
     );
   }

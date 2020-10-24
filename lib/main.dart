@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:news_app/models/data_holder.dart';
 import 'package:news_app/screens/home/bloc/headlines_bloc.dart';
 import 'package:news_app/screens/home/home_page.dart';
+import 'package:news_app/screens/location/cubit/location_cubit.dart';
 import 'package:news_app/screens/source/cubit/source_cubit.dart';
 import 'package:news_app/service/api_service.dart';
 import 'package:news_app/utils/constants.dart';
@@ -34,6 +36,12 @@ class MyApp extends StatelessWidget {
           ),
           BlocProvider<SourceCubit>(
             create: (context) => SourceCubit(service: service)..getSources(),
+          ),
+          BlocProvider<LocationCubit>(
+            create: (context) => LocationCubit(
+              dataHolder: LocationDataHolder(
+                  countries: countryList, selectedCountryIndex: 0),
+            )..getCountries(),
           ),
         ],
         child: MyHomePage(),
