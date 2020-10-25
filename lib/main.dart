@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:news_app/models/articles.dart';
 import 'package:news_app/models/data_holder.dart';
+import 'package:news_app/screens/detail/news_detail.dart';
+import 'package:news_app/screens/detail/news_webview.dart';
 import 'package:news_app/screens/home/bloc/headlines_bloc.dart';
 import 'package:news_app/screens/home/home_page.dart';
 import 'package:news_app/screens/location/cubit/geolocation_cubit.dart';
@@ -28,6 +31,25 @@ class MyApp extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       debugShowCheckedModeBanner: false,
+      onGenerateRoute: (settings) {
+        if (settings.name == NewsDetail.route) {
+          Articles article = settings.arguments;
+          return MaterialPageRoute(
+            builder: (context) => NewsDetail(
+              articles: article,
+            ),
+          );
+        }
+
+        if (settings.name == NewsWebView.route) {
+          String url = settings.arguments;
+          return MaterialPageRoute(
+            builder: (context) => NewsWebView(
+              url: url,
+            ),
+          );
+        }
+      },
       home: MultiBlocProvider(
         providers: [
           BlocProvider<HeadlinesBloc>(

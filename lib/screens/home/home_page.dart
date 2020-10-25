@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/models/country.dart';
 import 'package:news_app/models/sources.dart';
+import 'package:news_app/screens/detail/news_detail.dart';
 import 'package:news_app/screens/home/bloc/headlines_bloc.dart';
 import 'package:news_app/screens/home/widgets/article_widget.dart';
 import 'package:news_app/screens/home/widgets/bottom_loader.dart';
@@ -13,6 +14,8 @@ import 'package:news_app/screens/source/cubit/source_cubit.dart';
 import 'package:news_app/screens/source/source_bottom_sheet.dart';
 
 class MyHomePage extends StatefulWidget {
+  static final String route = '/';
+
   MyHomePage({Key key}) : super(key: key);
 
   @override
@@ -188,7 +191,16 @@ class _MyHomePageState extends State<MyHomePage> {
                       itemBuilder: (BuildContext context, int index) {
                         return index >= state.articles.length
                             ? BottomLoader()
-                            : ArticleWidget(article: state.articles[index]);
+                            : InkWell(
+                                child: ArticleWidget(
+                                  article: state.articles[index],
+                                ),
+                                onTap: () => Navigator.pushNamed(
+                                  context,
+                                  NewsDetail.route,
+                                  arguments: state.articles[index],
+                                ),
+                              );
                       },
                       itemCount: state.hasReachedMax
                           ? state.articles.length
