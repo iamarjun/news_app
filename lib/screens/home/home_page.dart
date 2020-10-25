@@ -8,6 +8,7 @@ import 'package:news_app/screens/home/bloc/headlines_bloc.dart';
 import 'package:news_app/screens/home/widgets/article_widget.dart';
 import 'package:news_app/screens/home/widgets/bottom_loader.dart';
 import 'package:news_app/screens/home/widgets/location_widget.dart';
+import 'package:news_app/screens/home/widgets/popup_menu.dart';
 import 'package:news_app/screens/location/cubit/geolocation_cubit.dart';
 import 'package:news_app/screens/location/cubit/location_cubit.dart';
 import 'package:news_app/screens/location/location_bottom_sheet.dart';
@@ -38,6 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    _selection = 'Newest';
     _scrollController.addListener(_onScroll);
     _headlinesBloc = BlocProvider.of<HeadlinesBloc>(context);
   }
@@ -61,60 +63,68 @@ class _MyHomePageState extends State<MyHomePage> {
                 return BlocBuilder<LocationCubit, LocationState>(
                   builder: (context, state) {
                     if (state is LocationInitial) {
-                      return LocationInkWell(onTap: () {
-                          Scaffold.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Loading locations...'),
-                            ),
-                          );
-                        }, location: country.country);
+                      return LocationInkWell(
+                          onTap: () {
+                            Scaffold.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Loading locations...'),
+                              ),
+                            );
+                          },
+                          location: country.country);
                     }
 
                     if (state is LocationFailure) {
-                      return LocationInkWell(onTap: () {
-                          Scaffold.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Something went wrong...'),
-                            ),
-                          );
-                        }, location: country.country);
+                      return LocationInkWell(
+                          onTap: () {
+                            Scaffold.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Something went wrong...'),
+                              ),
+                            );
+                          },
+                          location: country.country);
                     }
 
                     if (state is LocationSuccess) {
                       if (state.dataHolder.countries.isEmpty) {
-                        return LocationInkWell(onTap: () {
-                            Scaffold.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Locations not available...'),
-                              ),
-                            );
-                          }, location: country.country);
+                        return LocationInkWell(
+                            onTap: () {
+                              Scaffold.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Locations not available...'),
+                                ),
+                              );
+                            },
+                            location: country.country);
                       }
 
                       state.dataHolder.setCurrentCountry = country;
-                      return LocationInkWell(onTap: () {
-                          showModalBottomSheet(
-                            backgroundColor: Colors.transparent,
-                            context: context,
-                            builder: (context) => LocationBottomSheet(
-                              dataHolder: state.dataHolder,
-                              onPressed: (Country country) {
-                                print(country.toString());
-                                _headlinesBloc.add(
-                                  HeadlinesFetch(
-                                    country: country.code,
-                                  ),
-                                );
-                                setState(() {
-                                  _selectedCountry = country.name;
-                                });
-                                _selectedCountryCode = country.code;
-                                _selectedSourceIds = null;
-                                Navigator.of(context).pop();
-                              },
-                            ),
-                          );
-                        }, location: country.country);
+                      return LocationInkWell(
+                          onTap: () {
+                            showModalBottomSheet(
+                              backgroundColor: Colors.transparent,
+                              context: context,
+                              builder: (context) => LocationBottomSheet(
+                                dataHolder: state.dataHolder,
+                                onPressed: (Country country) {
+                                  print(country.toString());
+                                  _headlinesBloc.add(
+                                    HeadlinesFetch(
+                                      country: country.code,
+                                    ),
+                                  );
+                                  setState(() {
+                                    _selectedCountry = country.name;
+                                  });
+                                  _selectedCountryCode = country.code;
+                                  _selectedSourceIds = null;
+                                  Navigator.of(context).pop();
+                                },
+                              ),
+                            );
+                          },
+                          location: country.country);
                     }
                   },
                 );
@@ -150,34 +160,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   'Top Headlines',
                   style: TextStyle(fontSize: 22.0),
                 ),
-                PopupMenuButton<String>(
-                  child: Row(
-                    children: [
-                      Text('Sort: $_selection'),
-                      Icon(Icons.arrow_drop_down),
-                    ],
-                  ),
-                  onSelected: (String value) {
-                    setState(() {
-                      _selection = value;
-                    });
-                  },
-                  itemBuilder: (BuildContext context) =>
-                      <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
-                      value: 'Popular',
-                      child: Text('Popular'),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'Newest',
-                      child: Text('Newest'),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'Oldest',
-                      child: Text('Oldest'),
-                    ),
-                  ],
-                ),
+                PopupMenu(selection: _selection),
               ],
             ),
             SizedBox(
@@ -331,4 +314,3 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 }
-
