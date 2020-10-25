@@ -14,6 +14,7 @@ class HeadlinesBloc extends Bloc<HeadlinesEvent, HeadlinesState> {
   final ApiService service;
   String currentCountry;
   String currentSources;
+  String currentSearchQuery;
   HeadlinesBloc({@required this.service}) : super(HeadlinesInitial());
 
   @override
@@ -37,15 +38,24 @@ class HeadlinesBloc extends Bloc<HeadlinesEvent, HeadlinesState> {
             currentSources != event.sources) {
           currentCountry = event.country;
           currentSources = event.sources;
+          currentCountry = event.query;
 
           if (currentCountry != null) {
-            final articles = await _fetchArticlesByCountry(event.country, page);
+            final articles = await _fetchArticlesByCountry(
+              event.country,
+              event.query,
+              page,
+            );
             yield HeadlinesSuccess(articles: articles, hasReachedMax: false);
             return;
           }
 
           if (currentSources != null) {
-            final articles = await _fetchArticlesBySources(event.sources, page);
+            final articles = await _fetchArticlesBySources(
+              event.sources,
+              event.query,
+              page,
+            );
             yield HeadlinesSuccess(articles: articles, hasReachedMax: false);
             return;
           }
@@ -53,10 +63,14 @@ class HeadlinesBloc extends Bloc<HeadlinesEvent, HeadlinesState> {
         if (currentState is HeadlinesSuccess) {
           currentCountry = event.country;
           currentSources = event.sources;
+          currentCountry = event.query;
 
           if (currentCountry != null) {
-            final articles =
-                await _fetchArticlesByCountry(event.country, ++page);
+            final articles = await _fetchArticlesByCountry(
+              event.country,
+              event.query,
+              ++page,
+            );
             yield articles.isEmpty
                 ? currentState.copyWith(hasReachedMax: true)
                 : HeadlinesSuccess(
@@ -66,8 +80,11 @@ class HeadlinesBloc extends Bloc<HeadlinesEvent, HeadlinesState> {
           }
 
           if (currentSources != null) {
-            final articles =
-                await _fetchArticlesBySources(event.sources, ++page);
+            final articles = await _fetchArticlesBySources(
+              event.sources,
+              event.query,
+              ++page,
+            );
             yield articles.isEmpty
                 ? currentState.copyWith(hasReachedMax: true)
                 : HeadlinesSuccess(
@@ -87,9 +104,12 @@ class HeadlinesBloc extends Bloc<HeadlinesEvent, HeadlinesState> {
       state is HeadlinesSuccess && state.hasReachedMax;
 
   Future<List<Articles>> _fetchArticlesByCountry(
-      String country, int startIndex) async {
-    final response =
-        await service.getNewsFromCountry(country ?? 'in', '', startIndex);
+      String country, String query, int startIndex) async {
+    final response = await service.getNewsFromCountry(
+      country ?? 'in',
+      query ?? '',
+      startIndex,
+    );
     if (response != null) {
       return response.articles;
     } else {
@@ -98,9 +118,12 @@ class HeadlinesBloc extends Bloc<HeadlinesEvent, HeadlinesState> {
   }
 
   Future<List<Articles>> _fetchArticlesBySources(
-      String sources, int startIndex) async {
-    final response =
-        await service.getNewsFromSources(sources ?? '', '', startIndex);
+      String sources, String query, int startIndex) async {
+    final response = await service.getNewsFromSources(
+      sources ?? '',
+      query ?? '',
+      startIndex,
+    );
     if (response != null) {
       return response.articles;
     } else {

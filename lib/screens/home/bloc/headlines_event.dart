@@ -10,7 +10,8 @@ abstract class HeadlinesEvent extends Equatable {
 class HeadlinesFetch extends HeadlinesEvent {
   final String country;
   final String sources;
-  const HeadlinesFetch({this.country, this.sources});
+  final String query;
+  const HeadlinesFetch({this.country, this.sources, this.query});
 
   @override
   List<Object> get props => [country];

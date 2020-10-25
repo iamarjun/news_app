@@ -30,6 +30,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _selection;
   String _selectedCountryCode;
   String _selectedSourceIds;
+  String _searchQuery;
 
   @override
   void initState() {
@@ -124,7 +125,17 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Search(),
+            Search(
+              onSubmiited: (value) {
+                _headlinesBloc.add(
+                  HeadlinesFetch(
+                    country: _selectedCountryCode,
+                    sources: _selectedSourceIds,
+                    query: value,
+                  ),
+                );
+              },
+            ),
             SizedBox(
               height: 20,
             ),
