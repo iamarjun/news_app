@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
           BlocProvider<HeadlinesBloc>(
             create: (context) => HeadlinesBloc(service: service)
               ..add(
-                HeadlinesFetch(),
+                HeadlinesFetchByCountry(),
               ),
           ),
           BlocProvider<SourceCubit>(

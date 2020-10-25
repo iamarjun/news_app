@@ -28,16 +28,42 @@ class HeadlinesBloc extends Bloc<HeadlinesEvent, HeadlinesState> {
   ) async* {
     final currentState = state;
     int page = 0;
+    String currentCountry;
 
-    if (event is HeadlinesFetch && !_hasReachedMax(currentState)) {
+    if (event is HeadlinesFetchByCountry && !_hasReachedMax(currentState)) {
       try {
-        if (currentState is HeadlinesInitial) {
-          final articles = await _fetchArticles(page);
+        if (currentState is HeadlinesInitial ||
+            currentCountry != event.country) {
+          currentCountry = event.country;
+
+          final articles = await _fetchArticlesByCountry(event.country, page);
           yield HeadlinesSuccess(articles: articles, hasReachedMax: false);
           return;
         }
         if (currentState is HeadlinesSuccess) {
-          final articles = await _fetchArticles(++page);
+          final articles = await _fetchArticlesByCountry(event.country, ++page);
+          yield articles.isEmpty
+              ? currentState.copyWith(hasReachedMax: true)
+              : HeadlinesSuccess(
+                  articles: currentState.articles + articles,
+                  hasReachedMax: false,
+                );
+        }
+      } catch (e) {
+        print(e);
+        yield HeadlinesFailure();
+      }
+    }
+
+    if (event is HeadlinesFetchBySources && !_hasReachedMax(currentState)) {
+      try {
+        if (currentState is HeadlinesInitial) {
+          final articles = await _fetchArticlesBySources(event.sources, page);
+          yield HeadlinesSuccess(articles: articles, hasReachedMax: false);
+          return;
+        }
+        if (currentState is HeadlinesSuccess) {
+          final articles = await _fetchArticlesBySources(event.sources, ++page);
           yield articles.isEmpty
               ? currentState.copyWith(hasReachedMax: true)
               : HeadlinesSuccess(
@@ -55,8 +81,21 @@ class HeadlinesBloc extends Bloc<HeadlinesEvent, HeadlinesState> {
   bool _hasReachedMax(HeadlinesState state) =>
       state is HeadlinesSuccess && state.hasReachedMax;
 
-  Future<List<Articles>> _fetchArticles(int startIndex) async {
-    final response = await service.getNewsFromCountry('in', '', startIndex);
+  Future<List<Articles>> _fetchArticlesByCountry(
+      String country, int startIndex) async {
+    final response =
+        await service.getNewsFromCountry(country ?? 'in', '', startIndex);
+    if (response != null) {
+      return response.articles;
+    } else {
+      throw Exception('error fetching posts');
+    }
+  }
+
+  Future<List<Articles>> _fetchArticlesBySources(
+      String sources, int startIndex) async {
+    final response =
+        await service.getNewsFromSources(sources ?? '', '', startIndex);
     if (response != null) {
       return response.articles;
     } else {

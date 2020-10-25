@@ -39,7 +39,21 @@ class ApiService {
 
     return newsResponse;
   }
-  
+
+  Future<NewsResponse> getNewsFromSources(
+      String sources, String query, int page) async {
+    NewsResponse newsResponse;
+
+    try {
+      final response = await _client.getNewsFromSources(sources, query, page);
+      newsResponse = response;
+    } catch (e) {
+      print(e);
+    }
+
+    return newsResponse;
+  }
+
   Future<SourceResponse> getSource() async {
     SourceResponse sourceResponse;
 

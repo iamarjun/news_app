@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:news_app/models/country.dart';
+import 'package:news_app/models/sources.dart';
 import 'package:news_app/screens/home/bloc/headlines_bloc.dart';
 import 'package:news_app/screens/home/widgets/article_widget.dart';
 import 'package:news_app/screens/home/widgets/bottom_loader.dart';
@@ -23,6 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   HeadlinesBloc _headlinesBloc;
   String _selection;
+  String selectedCountry;
 
   @override
   void initState() {
@@ -85,7 +88,16 @@ class _MyHomePageState extends State<MyHomePage> {
                             builder: (context) => LocationBottomSheet(
                               dataHolder: state.dataHolder,
                               onChanged: (value) {},
-                              onPressed: () {},
+                              onPressed: (Country country) {
+                                print(country.toString());
+                                _headlinesBloc.add(
+                                  HeadlinesFetchByCountry(
+                                    country: country.code,
+                                  ),
+                                );
+                                selectedCountry = country.code;
+                                Navigator.of(context).pop();
+                              },
                             ),
                           );
                         },
@@ -227,7 +239,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   context: context,
                   builder: (context) => SourceBottomSheet(
                     source: state.sources,
-                    onPressed: () {},
+                    onPressed: (List<Sources> sources) {
+                      print(sources.toString());
+                    },
                   ),
                 );
               },
@@ -272,7 +286,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
     if (maxScroll - currentScroll <= _scrollThreshold) {
-      _headlinesBloc.add(HeadlinesFetch());
+      _headlinesBloc.add(HeadlinesFetchByCountry(country: selectedCountry));
     }
   }
 }

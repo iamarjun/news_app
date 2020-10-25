@@ -76,7 +76,9 @@ class _SourceBottomSheetState extends State<SourceBottomSheet> {
             ),
             Center(
               child: ElevatedButton(
-                onPressed: widget.onPressed,
+                onPressed: () => widget.onPressed(
+                  widget.source.where((element) => element.isSelected).toList(),
+                ),
                 child: Text('Apply Filters'),
               ),
             ),

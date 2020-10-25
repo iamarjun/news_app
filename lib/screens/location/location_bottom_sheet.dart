@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/models/country.dart';
 import 'package:news_app/models/data_holder.dart';
 import 'package:news_app/utils/constants.dart';
 
@@ -18,10 +19,10 @@ class LocationBottomSheet extends StatefulWidget {
 }
 
 class _LocationBottomSheetState extends State<LocationBottomSheet> {
+  Country _currentCountry;
+
   @override
   Widget build(BuildContext context) {
-
-
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.only(
@@ -70,6 +71,7 @@ class _LocationBottomSheetState extends State<LocationBottomSheet> {
                           setState(() {
                             widget.dataHolder.selectedCountryIndex = e.index;
                           });
+                          _currentCountry = e;
                         },
                       ),
                     )
@@ -81,7 +83,7 @@ class _LocationBottomSheetState extends State<LocationBottomSheet> {
             ),
             Center(
               child: ElevatedButton(
-                onPressed: widget.onPressed,
+                onPressed: () => widget.onPressed(_currentCountry),
                 child: Text('Apply'),
               ),
             ),
