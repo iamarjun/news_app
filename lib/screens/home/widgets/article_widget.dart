@@ -28,7 +28,7 @@ class ArticleWidget extends StatelessWidget {
                   SizedBox(
                     height: 6.0,
                   ),
-                  Text(article.description),
+                  Text(article.description ?? ''),
                   SizedBox(
                     height: 12.0,
                   ),
@@ -44,7 +44,7 @@ class ArticleWidget extends StatelessWidget {
               ),
             ),
             Image.network(
-              article.urlToImage,
+              article.urlToImage ?? ' ',
               height: 100,
               width: 100,
               fit: BoxFit.cover,

@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:news_app/models/news_response.dart';
 import 'package:news_app/models/source_response.dart';
-import 'package:news_app/service/rest_client.dart';
+import 'package:news_app/service/network/rest_client.dart';
 
 class ApiService {
   static final String _apiKey = '84a072f692a848689b11ff35496cddcc';

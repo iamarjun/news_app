@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:news_app/screens/home/bloc/headlines_bloc.dart';
 import 'package:news_app/screens/home/widgets/article_widget.dart';
 import 'package:news_app/screens/home/widgets/bottom_loader.dart';
+import 'package:news_app/screens/location/cubit/geolocation_cubit.dart';
 import 'package:news_app/screens/location/cubit/location_cubit.dart';
 import 'package:news_app/screens/location/location_bottom_sheet.dart';
 import 'package:news_app/screens/home/widgets/search_widget.dart';
@@ -20,7 +21,6 @@ class _MyHomePageState extends State<MyHomePage> {
   final _scrollController = ScrollController();
   final _scrollThreshold = 200.0;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  int _selectedCountry = 0;
   HeadlinesBloc _headlinesBloc;
   String _selection;
 
@@ -38,49 +38,59 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text('News'),
         actions: [
-          BlocBuilder<LocationCubit, LocationState>(
+          BlocBuilder<GeolocationCubit, GeolocationState>(
             builder: (context, state) {
-              if (state is LocationInitial) {
-                return buildLocationInkWell(() {
-                  Scaffold.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Loading locations...'),
-                    ),
-                  );
-                });
-              }
+              if (state is GeolocationSuccess) {
+                String countryCode = state.countryCode;
+                print(countryCode);
+                return BlocBuilder<LocationCubit, LocationState>(
+                  builder: (context, state) {
+                    if (state is LocationInitial) {
+                      return buildLocationInkWell(() {
+                        Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Loading locations...'),
+                          ),
+                        );
+                      });
+                    }
 
-              if (state is LocationFailure) {
-                return buildLocationInkWell(() {
-                  Scaffold.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Something went wrong...'),
-                    ),
-                  );
-                });
-              }
+                    if (state is LocationFailure) {
+                      return buildLocationInkWell(() {
+                        Scaffold.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Something went wrong...'),
+                          ),
+                        );
+                      });
+                    }
 
-              if (state is LocationSuccess) {
-                if (state.dataHolder.countries.isEmpty) {
-                  return buildLocationInkWell(() {
-                    Scaffold.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Locations not available...'),
-                      ),
-                    );
-                  });
-                }
-                return buildLocationInkWell(
-                  () {
-                    showModalBottomSheet(
-                      backgroundColor: Colors.transparent,
-                      context: context,
-                      builder: (context) => LocationBottomSheet(
-                        dataHolder: state.dataHolder,
-                        onChanged: (value) {},
-                        onPressed: () {},
-                      ),
-                    );
+                    if (state is LocationSuccess) {
+                      if (state.dataHolder.countries.isEmpty) {
+                        return buildLocationInkWell(() {
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Locations not available...'),
+                            ),
+                          );
+                        });
+                      }
+
+                      state.dataHolder.setCurrentCountryCode = countryCode;
+                      return buildLocationInkWell(
+                        () {
+                          showModalBottomSheet(
+                            backgroundColor: Colors.transparent,
+                            context: context,
+                            builder: (context) => LocationBottomSheet(
+                              dataHolder: state.dataHolder,
+                              onChanged: (value) {},
+                              onPressed: () {},
+                            ),
+                          );
+                        },
+                      );
+                    }
                   },
                 );
               }
