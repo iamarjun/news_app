@@ -101,30 +101,28 @@ class _MyHomePageState extends State<MyHomePage> {
 
                       state.dataHolder.setCurrentCountry = country;
                       return LocationInkWell(
-                          onTap: () {
-                            showModalBottomSheet(
-                              backgroundColor: Colors.transparent,
-                              context: context,
-                              builder: (context) => LocationBottomSheet(
-                                dataHolder: state.dataHolder,
-                                onPressed: (Country country) {
-                                  print(country.toString());
-                                  _headlinesBloc.add(
-                                    HeadlinesFetch(
-                                      country: country.code,
-                                    ),
-                                  );
-                                  setState(() {
-                                    _selectedCountry = country.name;
-                                  });
-                                  _selectedCountryCode = country.code;
-                                  _selectedSourceIds = null;
-                                  Navigator.of(context).pop();
-                                },
-                              ),
-                            );
-                          },
-                          location: country.country);
+                        onTap: () {
+                          showModalBottomSheet(
+                            backgroundColor: Colors.transparent,
+                            context: context,
+                            builder: (context) => LocationBottomSheet(
+                              dataHolder: state.dataHolder,
+                              onPressed: (Country country) {
+                                print(country.toString());
+                                _headlinesBloc.add(
+                                  HeadlinesFetch(
+                                    country: country.code,
+                                  ),
+                                );
+                                _selectedCountryCode = country.code;
+                                _selectedSourceIds = null;
+                                Navigator.of(context).pop();
+                              },
+                            ),
+                          );
+                        },
+                        location: country.country,
+                      );
                     }
                   },
                 );

@@ -26,7 +26,7 @@ class _LocationInkWellState extends State<LocationInkWell> {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: widget.onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 16.0,
@@ -48,7 +48,7 @@ class _LocationInkWellState extends State<LocationInkWell> {
                 SizedBox(
                   width: 3,
                 ),
-                Text(widget.location),
+                Text(location),
               ],
             ),
           ],

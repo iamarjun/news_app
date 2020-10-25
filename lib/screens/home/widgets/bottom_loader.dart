@@ -7,11 +7,9 @@ class BottomLoader extends StatelessWidget {
       alignment: Alignment.center,
       child: Center(
         child: SizedBox(
-          width: 33,
-          height: 33,
-          child: CircularProgressIndicator(
-            strokeWidth: 1.5,
-          ),
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(),
         ),
       ),
     );
