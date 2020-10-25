@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:news_app/models/articles.dart';
 import 'package:news_app/screens/detail/news_webview.dart';
 import 'package:news_app/utils/constants.dart';
@@ -7,6 +8,12 @@ class NewsDetail extends StatelessWidget {
   final Articles articles;
   static final String route = '/news_detail';
   const NewsDetail({Key key, this.articles}) : super(key: key);
+
+  String getFormattedDate(String date) {
+    DateTime dateTime = DateTime.parse(date);
+    String formattedDate = DateFormat('dd MMM, yyyy hh:mm a').format(dateTime);
+    return formattedDate;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +26,8 @@ class NewsDetail extends StatelessWidget {
             alignment: Alignment.bottomCenter,
             children: [
               Image.network(
-                articles.urlToImage,
+                articles.urlToImage ??
+                    'https://image.freepik.com/free-vector/breaking-news-title-template_97886-3228.jpg',
                 height: MediaQuery.of(context).size.height * 0.35,
                 fit: BoxFit.cover,
               ),
@@ -51,7 +59,7 @@ class NewsDetail extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0),
             child: Text(
-              articles.publishedAt,
+              getFormattedDate(articles.publishedAt),
               style: TextStyle(
                 fontSize: 12.0,
               ),

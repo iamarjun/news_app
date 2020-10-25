@@ -44,7 +44,7 @@ class ArticleWidget extends StatelessWidget {
               ),
             ),
             Image.network(
-              article.urlToImage ?? ' ',
+              article.urlToImage ?? 'https://image.freepik.com/free-vector/breaking-news-title-template_97886-3228.jpg',
               height: 100,
               width: 100,
               fit: BoxFit.cover,
