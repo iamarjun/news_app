@@ -5,12 +5,10 @@ import 'package:news_app/utils/constants.dart';
 
 class LocationBottomSheet extends StatefulWidget {
   final LocationDataHolder dataHolder;
-  final Function onChanged;
   final Function onPressed;
   const LocationBottomSheet(
       {Key key,
       @required this.dataHolder,
-      @required this.onChanged,
       @required this.onPressed})
       : super(key: key);
 

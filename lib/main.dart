@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
             ),
           );
         }
-
+        
         if (settings.name == NewsWebView.route) {
           String url = settings.arguments;
           return MaterialPageRoute(

@@ -7,6 +7,7 @@ import 'package:news_app/screens/detail/news_detail.dart';
 import 'package:news_app/screens/home/bloc/headlines_bloc.dart';
 import 'package:news_app/screens/home/widgets/article_widget.dart';
 import 'package:news_app/screens/home/widgets/bottom_loader.dart';
+import 'package:news_app/screens/home/widgets/location_widget.dart';
 import 'package:news_app/screens/location/cubit/geolocation_cubit.dart';
 import 'package:news_app/screens/location/cubit/location_cubit.dart';
 import 'package:news_app/screens/location/location_bottom_sheet.dart';
@@ -32,6 +33,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String _selectedCountryCode;
   String _selectedSourceIds;
   String _searchQuery;
+  String _selectedCountry;
 
   @override
   void initState() {
@@ -59,54 +61,43 @@ class _MyHomePageState extends State<MyHomePage> {
                 return BlocBuilder<LocationCubit, LocationState>(
                   builder: (context, state) {
                     if (state is LocationInitial) {
-                      return buildLocationInkWell(
-                        () {
+                      return LocationInkWell(onTap: () {
                           Scaffold.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Loading locations...'),
                             ),
                           );
-                        },
-                        country.country,
-                      );
+                        }, location: country.country);
                     }
 
                     if (state is LocationFailure) {
-                      return buildLocationInkWell(
-                        () {
+                      return LocationInkWell(onTap: () {
                           Scaffold.of(context).showSnackBar(
                             SnackBar(
                               content: Text('Something went wrong...'),
                             ),
                           );
-                        },
-                        country.country,
-                      );
+                        }, location: country.country);
                     }
 
                     if (state is LocationSuccess) {
                       if (state.dataHolder.countries.isEmpty) {
-                        return buildLocationInkWell(
-                          () {
+                        return LocationInkWell(onTap: () {
                             Scaffold.of(context).showSnackBar(
                               SnackBar(
                                 content: Text('Locations not available...'),
                               ),
                             );
-                          },
-                          country.country,
-                        );
+                          }, location: country.country);
                       }
 
                       state.dataHolder.setCurrentCountry = country;
-                      return buildLocationInkWell(
-                        () {
+                      return LocationInkWell(onTap: () {
                           showModalBottomSheet(
                             backgroundColor: Colors.transparent,
                             context: context,
                             builder: (context) => LocationBottomSheet(
                               dataHolder: state.dataHolder,
-                              onChanged: (value) {},
                               onPressed: (Country country) {
                                 print(country.toString());
                                 _headlinesBloc.add(
@@ -114,15 +105,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                     country: country.code,
                                   ),
                                 );
+                                setState(() {
+                                  _selectedCountry = country.name;
+                                });
                                 _selectedCountryCode = country.code;
                                 _selectedSourceIds = null;
                                 Navigator.of(context).pop();
                               },
                             ),
                           );
-                        },
-                        country.country,
-                      );
+                        }, location: country.country);
                     }
                   },
                 );
@@ -302,39 +294,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  InkWell buildLocationInkWell(Function onTap, String location) {
-    return InkWell(
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Location'),
-            SizedBox(
-              height: 3,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Icon(
-                  Icons.location_on,
-                  size: 15,
-                ),
-                SizedBox(
-                  width: 3,
-                ),
-                Text(location),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   String getSourceIdsFromSourceList(List<Sources> sources) {
     String sourceIds = '';
 
@@ -372,3 +331,4 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 }
+
