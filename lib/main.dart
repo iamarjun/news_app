@@ -31,10 +31,7 @@ class MyApp extends StatelessWidget {
       home: MultiBlocProvider(
         providers: [
           BlocProvider<HeadlinesBloc>(
-            create: (context) => HeadlinesBloc(service: service)
-              ..add(
-                HeadlinesFetchByCountry(),
-              ),
+            create: (context) => HeadlinesBloc(service: service),
           ),
           BlocProvider<SourceCubit>(
             create: (context) => SourceCubit(service: service)..getSources(),

@@ -12,7 +12,8 @@ part 'headlines_state.dart';
 
 class HeadlinesBloc extends Bloc<HeadlinesEvent, HeadlinesState> {
   final ApiService service;
-
+  String currentCountry;
+  String currentSources;
   HeadlinesBloc({@required this.service}) : super(HeadlinesInitial());
 
   @override
@@ -28,48 +29,52 @@ class HeadlinesBloc extends Bloc<HeadlinesEvent, HeadlinesState> {
   ) async* {
     final currentState = state;
     int page = 0;
-    String currentCountry;
 
-    if (event is HeadlinesFetchByCountry && !_hasReachedMax(currentState)) {
+    if (event is HeadlinesFetch && !_hasReachedMax(currentState)) {
       try {
         if (currentState is HeadlinesInitial ||
-            currentCountry != event.country) {
+            currentCountry != event.country ||
+            currentSources != event.sources) {
           currentCountry = event.country;
+          currentSources = event.sources;
 
-          final articles = await _fetchArticlesByCountry(event.country, page);
-          yield HeadlinesSuccess(articles: articles, hasReachedMax: false);
-          return;
+          if (currentCountry != null) {
+            final articles = await _fetchArticlesByCountry(event.country, page);
+            yield HeadlinesSuccess(articles: articles, hasReachedMax: false);
+            return;
+          }
+
+          if (currentSources != null) {
+            final articles = await _fetchArticlesBySources(event.sources, page);
+            yield HeadlinesSuccess(articles: articles, hasReachedMax: false);
+            return;
+          }
         }
         if (currentState is HeadlinesSuccess) {
-          final articles = await _fetchArticlesByCountry(event.country, ++page);
-          yield articles.isEmpty
-              ? currentState.copyWith(hasReachedMax: true)
-              : HeadlinesSuccess(
-                  articles: currentState.articles + articles,
-                  hasReachedMax: false,
-                );
-        }
-      } catch (e) {
-        print(e);
-        yield HeadlinesFailure();
-      }
-    }
+          currentCountry = event.country;
+          currentSources = event.sources;
 
-    if (event is HeadlinesFetchBySources && !_hasReachedMax(currentState)) {
-      try {
-        if (currentState is HeadlinesInitial) {
-          final articles = await _fetchArticlesBySources(event.sources, page);
-          yield HeadlinesSuccess(articles: articles, hasReachedMax: false);
-          return;
-        }
-        if (currentState is HeadlinesSuccess) {
-          final articles = await _fetchArticlesBySources(event.sources, ++page);
-          yield articles.isEmpty
-              ? currentState.copyWith(hasReachedMax: true)
-              : HeadlinesSuccess(
-                  articles: currentState.articles + articles,
-                  hasReachedMax: false,
-                );
+          if (currentCountry != null) {
+            final articles =
+                await _fetchArticlesByCountry(event.country, ++page);
+            yield articles.isEmpty
+                ? currentState.copyWith(hasReachedMax: true)
+                : HeadlinesSuccess(
+                    articles: currentState.articles + articles,
+                    hasReachedMax: false,
+                  );
+          }
+
+          if (currentSources != null) {
+            final articles =
+                await _fetchArticlesBySources(event.sources, ++page);
+            yield articles.isEmpty
+                ? currentState.copyWith(hasReachedMax: true)
+                : HeadlinesSuccess(
+                    articles: currentState.articles + articles,
+                    hasReachedMax: false,
+                  );
+          }
         }
       } catch (e) {
         print(e);

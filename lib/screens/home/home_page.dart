@@ -25,7 +25,8 @@ class _MyHomePageState extends State<MyHomePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   HeadlinesBloc _headlinesBloc;
   String _selection;
-  String selectedCountry;
+  String _selectedCountryCode;
+  String _selectedSourceIds;
 
   @override
   void initState() {
@@ -45,6 +46,10 @@ class _MyHomePageState extends State<MyHomePage> {
             builder: (context, state) {
               if (state is GeolocationSuccess) {
                 String countryCode = state.countryCode;
+                _selectedCountryCode = countryCode;
+                _headlinesBloc.add(
+                  HeadlinesFetch(country: countryCode),
+                );
                 print(countryCode);
                 return BlocBuilder<LocationCubit, LocationState>(
                   builder: (context, state) {
@@ -91,11 +96,12 @@ class _MyHomePageState extends State<MyHomePage> {
                               onPressed: (Country country) {
                                 print(country.toString());
                                 _headlinesBloc.add(
-                                  HeadlinesFetchByCountry(
+                                  HeadlinesFetch(
                                     country: country.code,
                                   ),
                                 );
-                                selectedCountry = country.code;
+                                _selectedCountryCode = country.code;
+                                _selectedSourceIds = null;
                                 Navigator.of(context).pop();
                               },
                             ),
@@ -241,6 +247,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     source: state.sources,
                     onPressed: (List<Sources> sources) {
                       print(sources.toString());
+                      String sIds = getSourceIdsFromSourceList(sources);
+                      _selectedSourceIds = sIds;
+                      _selectedCountryCode = null;
+                      _headlinesBloc.add(
+                        HeadlinesFetch(
+                          sources: sIds,
+                        ),
+                      );
+                      Navigator.of(context).pop();
                     },
                   ),
                 );
@@ -267,6 +282,16 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  String getSourceIdsFromSourceList(List<Sources> sources) {
+    String sourceIds = '';
+
+    sources.forEach((element) {
+      sourceIds += '${element.id},';
+    });
+
+    return sourceIds;
+  }
+
   FloatingActionButton buildFloatingActionButton(Function onPressed) {
     return FloatingActionButton(
       child: Icon(
@@ -286,7 +311,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final maxScroll = _scrollController.position.maxScrollExtent;
     final currentScroll = _scrollController.position.pixels;
     if (maxScroll - currentScroll <= _scrollThreshold) {
-      _headlinesBloc.add(HeadlinesFetchByCountry(country: selectedCountry));
+      _headlinesBloc.add(HeadlinesFetch(
+          country: _selectedCountryCode, sources: _selectedSourceIds));
     }
   }
 }

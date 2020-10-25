@@ -7,20 +7,11 @@ abstract class HeadlinesEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class HeadlinesFetchByCountry extends HeadlinesEvent {
+class HeadlinesFetch extends HeadlinesEvent {
   final String country;
-
-  const HeadlinesFetchByCountry({this.country});
+  final String sources;
+  const HeadlinesFetch({this.country, this.sources});
 
   @override
   List<Object> get props => [country];
-}
-
-class HeadlinesFetchBySources extends HeadlinesEvent {
-  final String sources;
-
-  const HeadlinesFetchBySources({this.sources});
-
-  @override
-  List<Object> get props => [sources];
 }
