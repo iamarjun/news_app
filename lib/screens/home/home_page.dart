@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:news_app/models/country.dart';
 import 'package:news_app/models/sources.dart';
 import 'package:news_app/screens/detail/news_detail.dart';
@@ -49,46 +50,55 @@ class _MyHomePageState extends State<MyHomePage> {
           BlocBuilder<GeolocationCubit, GeolocationState>(
             builder: (context, state) {
               if (state is GeolocationSuccess) {
-                String countryCode = state.countryCode;
-                _selectedCountryCode = countryCode;
+                Placemark country = state.country;
+                _selectedCountryCode = country.isoCountryCode;
                 _headlinesBloc.add(
-                  HeadlinesFetch(country: countryCode),
+                  HeadlinesFetch(country: _selectedCountryCode),
                 );
-                print(countryCode);
+                print(country.toString());
                 return BlocBuilder<LocationCubit, LocationState>(
                   builder: (context, state) {
                     if (state is LocationInitial) {
-                      return buildLocationInkWell(() {
-                        Scaffold.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Loading locations...'),
-                          ),
-                        );
-                      });
+                      return buildLocationInkWell(
+                        () {
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Loading locations...'),
+                            ),
+                          );
+                        },
+                        country.country,
+                      );
                     }
 
                     if (state is LocationFailure) {
-                      return buildLocationInkWell(() {
-                        Scaffold.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Something went wrong...'),
-                          ),
-                        );
-                      });
+                      return buildLocationInkWell(
+                        () {
+                          Scaffold.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Something went wrong...'),
+                            ),
+                          );
+                        },
+                        country.country,
+                      );
                     }
 
                     if (state is LocationSuccess) {
                       if (state.dataHolder.countries.isEmpty) {
-                        return buildLocationInkWell(() {
-                          Scaffold.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Locations not available...'),
-                            ),
-                          );
-                        });
+                        return buildLocationInkWell(
+                          () {
+                            Scaffold.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Locations not available...'),
+                              ),
+                            );
+                          },
+                          country.country,
+                        );
                       }
 
-                      state.dataHolder.setCurrentCountryCode = countryCode;
+                      state.dataHolder.setCurrentCountry = country;
                       return buildLocationInkWell(
                         () {
                           showModalBottomSheet(
@@ -111,6 +121,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           );
                         },
+                        country.country,
                       );
                     }
                   },
@@ -127,6 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             Search(
               onSubmiited: (value) {
+                _searchQuery = value;
                 _headlinesBloc.add(
                   HeadlinesFetch(
                     country: _selectedCountryCode,
@@ -290,7 +302,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  InkWell buildLocationInkWell(Function onTap) {
+  InkWell buildLocationInkWell(Function onTap, String location) {
     return InkWell(
       onTap: onTap,
       child: Padding(
@@ -299,7 +311,25 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: [Icon(Icons.location_on), Text('India')],
+          children: [
+            Text('Location'),
+            SizedBox(
+              height: 3,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Icon(
+                  Icons.location_on,
+                  size: 15,
+                ),
+                SizedBox(
+                  width: 3,
+                ),
+                Text(location),
+              ],
+            ),
+          ],
         ),
       ),
     );
@@ -335,7 +365,10 @@ class _MyHomePageState extends State<MyHomePage> {
     final currentScroll = _scrollController.position.pixels;
     if (maxScroll - currentScroll <= _scrollThreshold) {
       _headlinesBloc.add(HeadlinesFetch(
-          country: _selectedCountryCode, sources: _selectedSourceIds));
+        country: _selectedCountryCode,
+        sources: _selectedSourceIds,
+        query: _searchQuery,
+      ));
     }
   }
 }

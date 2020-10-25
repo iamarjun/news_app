@@ -12,10 +12,10 @@ class GeolocationInitial extends GeolocationState {}
 class GeolocationFailure extends GeolocationState {}
 
 class GeolocationSuccess extends GeolocationState {
-  final String countryCode;
+  final Placemark country;
 
-  const GeolocationSuccess({this.countryCode});
+  const GeolocationSuccess({this.country});
 
   @override
-  List<Object> get props => [countryCode];
+  List<Object> get props => [country];
 }

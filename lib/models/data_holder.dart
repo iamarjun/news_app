@@ -1,14 +1,15 @@
+import 'package:geocoding/geocoding.dart';
 import 'package:news_app/models/country.dart';
 
 class LocationDataHolder {
   List<Country> countries;
   int selectedCountryIndex;
-  String currentCountryCode;
+  Placemark currentCountry;
 
-  set setCurrentCountryCode(String value) {
-    currentCountryCode = value;
+  set setCurrentCountry(Placemark country) {
+    currentCountry = country;
     selectedCountryIndex = countries.indexWhere(
-      (element) => element.code == value.toLowerCase(),
+      (element) => element.code == currentCountry.isoCountryCode.toLowerCase(),
     );
   }
 
